@@ -1,0 +1,46 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class SubMap : MonoBehaviour
+{
+    public Transform[] Positions;
+    private int index;
+    private bool hasReachEnd;
+    // Start is called before the first frame update
+    void Start()
+    {
+        index = 0;
+        hasReachEnd = false;
+    }
+    public Vector3 GetPlayerCurrentTargetPosition(Vector3 currentPosition)
+    {
+        if (Positions.Length == 0)
+        {
+            if (Vector3.Distance(currentPosition, this.transform.position) <= 0.1f) hasReachEnd = true;
+            return this.transform.position;
+        }
+
+        if (Vector3.Distance(currentPosition,Positions[index].position)<=0.1f)
+        {
+            index++;
+            if(index >= Positions.Length)
+            {
+                index--;
+                hasReachEnd = true;
+            }
+        }
+        return Positions[index].position;
+    }
+
+    public bool GetHasReachEnd()
+    {
+        return hasReachEnd;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+}
