@@ -1,0 +1,120 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerAttributes : MonoBehaviour
+{
+    public static PlayerAttributes Instance;
+
+    public enum PLAYER_ATT
+    {
+        HP,
+        DEF,
+        ATK,
+    }
+    public int[] PlayerInitAtt;
+    public int[] PlayerATT;
+    public ArrayList SpecialSkillList;
+    public ArrayList Buffs;
+
+    private int[] playerATTAtBattleBegin;
+    // Start is called before the first frame update
+    void Start()
+    {
+        PlayerATT = new int[System.Enum.GetValues(typeof(PLAYER_ATT)).Length];
+        playerATTAtBattleBegin = new int[System.Enum.GetValues(typeof(PLAYER_ATT)).Length];
+        SpecialSkillList = new ArrayList();
+        Buffs = new ArrayList();
+        for (int i = 0;i<PlayerATT.Length;i++)
+        {
+            PlayerATT[i] = PlayerInitAtt[i];
+        }
+    }
+
+    public bool DoesPlayerHasSpecialSkill(BaseSkillTree.SPECIAL_SKILL specialSkill)
+    {
+        for(int i = 0;i<SpecialSkillList.Count;i++)
+        {
+            if ((BaseSkillTree.SPECIAL_SKILL)SpecialSkillList[i] == specialSkill)
+                return true;
+        }
+        return false;
+    }
+
+    public void HandleBattleStart()
+    {
+        for(int i = 0;i<PlayerATT.Length;i++)
+        {
+            playerATTAtBattleBegin[i] = PlayerATT[i];
+        }
+    }
+
+    public int GetWeakSkillAdjustDefValue()
+    {
+        if(DoesPlayerHasSpecialSkill(BaseSkillTree.SPECIAL_SKILL.WEAK_EFFECT_DECREASE_TWO_DEF))
+        {
+            return -2;
+        }
+        else if(DoesPlayerHasSpecialSkill(BaseSkillTree.SPECIAL_SKILL.INFLICT_WEAK_EFFECT_ON_HIT))
+        {
+            return -1;
+        }
+        return 0;
+    }
+
+    public void HandleBattleEnd()
+    {
+        for (int i = 0; i < PlayerATT.Length; i++)
+        {
+            if (i == (int)PlayerAttributes.PLAYER_ATT.HP) continue;
+            PlayerATT[i] = playerATTAtBattleBegin[i];
+        }
+        Buffs.Clear();
+    }
+
+    public bool GetIfHasBuff(BaseSkillTree.BUFFS buff)
+    {
+        for (int i = 0; i < Buffs.Count; i++)
+        {
+            if ((BaseSkillTree.BUFFS)Buffs[i] == buff) return true;
+        }
+        return false;
+    }
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+    }
+
+    public void HandlePlayerAttChanged(int value, PLAYER_ATT att)
+    {
+        PlayerATT[(int)att] += value;
+        if (PlayerATT[(int)att] <= 1) PlayerATT[(int)att] = 1;
+    }
+
+    public void TakeDamage(int atk)
+    {
+        int actualDMG = Mathf.Clamp(atk - PlayerATT[(int)PlayerAttributes.PLAYER_ATT.DEF], 1, int.MaxValue);
+        PlayerATT[(int)PlayerAttributes.PLAYER_ATT.HP] -= actualDMG;
+        if(DoesPlayerHasSpecialSkill(BaseSkillTree.SPECIAL_SKILL.ATK_UP_ONE_WHEN_GET_DAMAGE_CURRENT_ENEMY))
+        {
+            PlayerATT[(int)PlayerAttributes.PLAYER_ATT.ATK]++;
+        }
+    }
+
+    public int DoDamage()
+    {
+        return PlayerATT[(int)PlayerAttributes.PLAYER_ATT.ATK];
+    }
+
+    public int GetCurrentHP()
+    {
+        return PlayerATT[(int)PlayerAttributes.PLAYER_ATT.HP];
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+}
