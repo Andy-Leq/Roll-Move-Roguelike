@@ -1,0 +1,74 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class BattleManager : MonoBehaviour
+{
+    public static BattleManager Instance;
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+    }
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    public void HandleBattleStart(GameObject enemy)
+    {
+        PlayerAttributes playeratt = PlayerAttributes.Instance;
+        EnemyBase enemyatt = enemy.GetComponent<EnemyBase>();
+        PlayerAttributes.Instance.HandleBattleStart();
+        enemyatt.HandleBattleStart();
+        StartCoroutine(Battle(playeratt, enemyatt));
+    }
+
+    IEnumerator Battle(PlayerAttributes playeratt, EnemyBase enemyatt)
+    {
+        int count = 0;
+        while(true)
+        {
+            if(count%2 == 0)
+            {
+                int atk = playeratt.DoDamage();
+                enemyatt.TakeDamage(atk);
+                if(playeratt.DoesPlayerHasSpecialSkill(BaseSkillTree.SPECIAL_SKILL.INFLICT_WEAK_EFFECT_ON_HIT))
+                {
+                    enemyatt.HandleBuffed(BaseSkillTree.BUFFS.WEAK);
+                }
+                if (enemyatt.GetCurrentHP() <= 0)
+                {
+                    break;
+                }
+            }
+            else
+            {
+                int atk = enemyatt.DoDamage();
+                playeratt.TakeDamage(atk);
+                if (playeratt.GetCurrentHP() <= 0)
+                {
+                    break;
+                }
+            }
+            for(int i = 0;i<enemyatt.CurrentAttributes.Length;i++)
+            {
+                print("Enemy" + Enum.GetName(typeof(PlayerAttributes.PLAYER_ATT), i) + ":"+enemyatt.CurrentAttributes[i]);
+            }
+            for (int i = 0; i < playeratt.PlayerATT.Length; i++)
+            {
+                print("Player" + Enum.GetName(typeof(PlayerAttributes.PLAYER_ATT), i) + ":" + playeratt.PlayerATT[i]);
+            }
+            count++;
+            yield return new WaitForSeconds(1);
+        }
+        PlayerAttributes.Instance.HandleBattleEnd();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+}
