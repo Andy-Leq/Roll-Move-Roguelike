@@ -1,0 +1,26 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class SpecialSkillTree : BaseSkillTree
+{
+    public LEVEL_UP_REWARD[] Rewards =
+    {
+        new LEVEL_UP_REWARD{ATK = 0,HP = 0, DEF = 0, SpecialSkill = SPECIAL_SKILL.INFLICT_WEAK_EFFECT_ON_HIT },
+        new LEVEL_UP_REWARD{ATK = 0,HP = 0, DEF = 0, SpecialSkill = SPECIAL_SKILL.WEAK_EFFECT_DECREASE_TWO_DEF },
+        new LEVEL_UP_REWARD{ATK = 0,HP = 0, DEF = 0, SpecialSkill = SPECIAL_SKILL.GET_HIT_INFLICT_STUBBORN_EFFECT },
+        new LEVEL_UP_REWARD{ATK = 0,HP = 0, DEF = 0, SpecialSkill = SPECIAL_SKILL.ALL_EFFECT_LAST_THREE_ROUNDS },
+        new LEVEL_UP_REWARD{ATK = 0,HP = 0, DEF = 0, SpecialSkill = SPECIAL_SKILL.KILL_WEAK_EFFECT_ENEMY_WHEN_LESS_THAN_FIVE_HP },
+    };
+
+    private void Start()
+    {
+        MaxSkillLevel = Rewards.Length;
+        levelUpRewards = new LEVEL_UP_REWARD[MaxSkillLevel];
+        for (int i = 0; i < MaxSkillLevel; i++)
+        {
+            levelUpRewards[i] = Rewards[i];
+        }
+        CurrentSkillLevel = 0;
+    }
+}
