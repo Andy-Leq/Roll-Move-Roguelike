@@ -1,0 +1,67 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class MapGenerator : MonoBehaviour
+{
+    enum ENVIRONMENT_TYPE
+    {
+        FOREST,
+        SNOW,
+    }
+    public Sprite[] MapSet_Forest;
+    public Sprite[] MapSet_Snow;
+
+
+    private int[] randomIndex;
+    private Sprite[] GetMapSet(ENVIRONMENT_TYPE type)
+    {
+        switch (type)
+        {
+            case ENVIRONMENT_TYPE.FOREST:
+                return MapSet_Forest;
+            case ENVIRONMENT_TYPE.SNOW:
+                return MapSet_Snow;
+            default:
+                return null;
+        }
+
+    }
+
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        GenerateRandomSubMap(ENVIRONMENT_TYPE.FOREST);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    private void GenerateRandomSubMap(ENVIRONMENT_TYPE type)
+    {
+        Sprite[] images = GetMapSet(type);
+        randomIndex = new int[images.Length];
+        for(int i = 0;i<images.Length;i++)
+        {
+            randomIndex[i] = i;
+        }
+        randomIndex = Shuffle(randomIndex);
+    }
+
+    public int[] Shuffle(int[] deck)
+    {
+        for(int i = 0;i<deck.Length;i++)
+        {
+            int rnd = Random.Range(i,deck.Length);
+            int temp = deck[rnd];
+            deck[rnd] = deck[i];
+            deck[i] = temp;
+        }
+        return deck;
+    }
+}
