@@ -1,0 +1,27 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class AttackSkillTree : BaseSkillTree
+{
+    public LEVEL_UP_REWARD[] Rewards =
+    {
+        new LEVEL_UP_REWARD{ATK = 1,HP = 0, DEF = 0, SpecialSkill = SPECIAL_SKILL.NONE },
+        new LEVEL_UP_REWARD{ATK = 2,HP = 0, DEF = -1, SpecialSkill = SPECIAL_SKILL.NONE },
+        new LEVEL_UP_REWARD{ATK = 2,HP = -1, DEF = 0, SpecialSkill = SPECIAL_SKILL.NONE },
+        new LEVEL_UP_REWARD{ATK = 0,HP = 0, DEF = 0, SpecialSkill = SPECIAL_SKILL.ATK_UP_ONE_EVERY_TWO_HITS },
+        new LEVEL_UP_REWARD{ATK = 0,HP = 0, DEF = 0, SpecialSkill = SPECIAL_SKILL.ATK_UP_TWO_ON_WEAK_EFFECT },
+    };
+
+    private void Start()
+    {
+        MaxSkillLevel = Rewards.Length;
+        levelUpRewards = new LEVEL_UP_REWARD[MaxSkillLevel];
+        for (int i = 0; i < MaxSkillLevel; i++)
+        {
+            levelUpRewards[i] = Rewards[i];
+        }
+        CurrentSkillLevel = 0;
+        
+    }
+}
