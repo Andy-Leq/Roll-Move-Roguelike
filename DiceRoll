@@ -1,0 +1,38 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class DiceRoll : MonoBehaviour
+{
+    public float Speed;
+    private int currentPosIndex;
+    private bool moveEnd;
+    // Start is called before the first frame update
+    void Start()
+    {
+        currentPosIndex = 0;
+        moveEnd = false;
+    }
+
+    public void HandlePlayerMoveToPosition(int targetIndex)
+    {
+        Vector3 targetPos = MapManager.Instance.positions[currentPosIndex].GetComponent<SubMap>().GetPlayerCurrentTargetPosition(this.transform.position);
+        if(MapManager.Instance.positions[currentPosIndex].GetComponent<SubMap>().GetHasReachEnd())
+        {
+            currentPosIndex++;
+            if (currentPosIndex >= targetIndex)
+            {
+                moveEnd = true;
+                return;
+            }
+            targetPos = MapManager.Instance.positions[currentPosIndex].GetComponent<SubMap>().GetPlayerCurrentTargetPosition(this.transform.position);
+        }
+        this.transform.position = Vector3.MoveTowards(this.transform.position, targetPos, Speed * Time.deltaTime);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if(!moveEnd) HandlePlayerMoveToPosition(5);
+    }
+}
