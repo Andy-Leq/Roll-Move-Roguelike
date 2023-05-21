@@ -1,0 +1,115 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class BaseSkillTree : MonoBehaviour
+{
+    public int CurrentSkillLevel;
+    public int MaxSkillLevel;
+    public LEVEL_UP_REWARD[] levelUpRewards;
+    
+    public enum SPECIAL_SKILL
+    {
+        NONE,
+        //SURVIVAL TREE
+        ATK_UP_ONE_WHEN_GET_DAMAGE_CURRENT_ENEMY,
+
+        //ATTACK TREE
+        ATK_UP_ONE_EVERY_TWO_HITS,
+        ATK_UP_TWO_ON_WEAK_EFFECT,
+
+        //SPECIAL TREE
+        INFLICT_WEAK_EFFECT_ON_HIT,
+        WEAK_EFFECT_DECREASE_TWO_DEF,
+        GET_HIT_INFLICT_STUBBORN_EFFECT,
+        ALL_EFFECT_LAST_THREE_ROUNDS,
+        KILL_WEAK_EFFECT_ENEMY_WHEN_LESS_THAN_FIVE_HP,
+    }
+
+    public enum BUFFS
+    {
+        WEAK,
+        STUBBORN
+    }
+
+
+    public struct LEVEL_UP_REWARD
+    {
+        public int ATK;
+        public int DEF;
+        public int HP;
+        public SPECIAL_SKILL SpecialSkill;
+    }
+
+    public string GetSpecialSkillText(SPECIAL_SKILL Skill)
+    {
+        switch (Skill)
+        {
+            case SPECIAL_SKILL.NONE:
+                return null;
+            //SURVIVAL TREE
+            case SPECIAL_SKILL.ATK_UP_ONE_WHEN_GET_DAMAGE_CURRENT_ENEMY:
+                return "Player get 1 attack power when receiving damage while fighting current enemy";
+
+            //ATTACK TREE
+            case SPECIAL_SKILL.ATK_UP_ONE_EVERY_TWO_HITS:
+                return "Player get 1 attack power every 2 hits";
+            case SPECIAL_SKILL.ATK_UP_TWO_ON_WEAK_EFFECT:
+                return "Player's attack power increase 2 when enemy got inflicted *weak*";
+
+            //SPECIAL TREE
+            case SPECIAL_SKILL.INFLICT_WEAK_EFFECT_ON_HIT:
+                return "Player's attack inflict enemy with *weak* effect";
+            case SPECIAL_SKILL.WEAK_EFFECT_DECREASE_TWO_DEF:
+                return "*weak* effect decrease two enemy defence";
+            case SPECIAL_SKILL.GET_HIT_INFLICT_STUBBORN_EFFECT:
+                return "Player gains *stubborn* when got hit";
+            case SPECIAL_SKILL.ALL_EFFECT_LAST_THREE_ROUNDS://delete
+                return "All effects last one more round";
+            case SPECIAL_SKILL.KILL_WEAK_EFFECT_ENEMY_WHEN_LESS_THAN_FIVE_HP:
+                return "When *weak* enemy is less than 5 HP, one hit can take it down";
+
+            default:
+                return null;
+        }
+
+    }
+
+    public string GetNextLevelSkillDescription()
+    {
+        if (CurrentSkillLevel >= MaxSkillLevel) return null;
+        LEVEL_UP_REWARD reward = levelUpRewards[CurrentSkillLevel];
+        string returnText = "";
+        if (reward.ATK != 0) returnText += "ATTACK CHANGE:"     + reward.ATK + "\n";
+        if (reward.DEF != 0) returnText += "DEFENCE CHANGE:"    + reward.DEF + "\n";
+        if (reward.HP  != 0) returnText += "HP CHANGE:"         + reward.HP  + "\n";
+        if (reward.SpecialSkill != SPECIAL_SKILL.NONE) returnText += GetSpecialSkillText(reward.SpecialSkill);
+        return returnText;
+    }
+
+    public virtual void HandleSkillLevelUp()
+    {
+        if (CurrentSkillLevel + 1 > MaxSkillLevel) return;
+        LEVEL_UP_REWARD reward = levelUpRewards[CurrentSkillLevel];
+        PlayerAttributes.Instance.HandlePlayerAttChanged(reward.ATK, PlayerAttributes.PLAYER_ATT.ATK);
+        PlayerAttributes.Instance.HandlePlayerAttChanged(reward.DEF, PlayerAttributes.PLAYER_ATT.DEF);
+        PlayerAttributes.Instance.HandlePlayerAttChanged(reward.HP,  PlayerAttributes.PLAYER_ATT.HP);
+        if(reward.SpecialSkill!=SPECIAL_SKILL.NONE)
+        {
+            PlayerAttributes.Instance.SpecialSkillList.Add(reward.SpecialSkill);
+        }
+        CurrentSkillLevel++;
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+}
