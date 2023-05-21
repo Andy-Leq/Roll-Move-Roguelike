@@ -1,0 +1,69 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EnemyBase : MonoBehaviour
+{
+    public int[] InitialAttributes;
+    public int[] CurrentAttributes;
+    private int[] AttBeforeBattle;
+    public ArrayList Buffs;
+    virtual public void OnStart()
+    {
+        CurrentAttributes = new int[System.Enum.GetValues(typeof(PlayerAttributes.PLAYER_ATT)).Length];
+        for(int i = 0;i<InitialAttributes.Length;i++)
+        {
+            CurrentAttributes[i] = InitialAttributes[i];
+        }
+        Buffs = new ArrayList();
+    }
+
+    public void HandleBattleStart()
+    {
+        //for (int i = 0; i < CurrentAttributes.Length; i++)
+        //{
+        //    //AttBeforeBattle[i] = CurrentAttributes[i];
+        //}
+    }
+
+    public bool GetIfHasBuff(BaseSkillTree.BUFFS buff)
+    {
+        for(int i = 0;i<Buffs.Count;i++)
+        {
+            if ((BaseSkillTree.BUFFS)Buffs[i] == buff) return true;
+        }
+        return false;
+    }
+
+    public void HandleBuffed(BaseSkillTree.BUFFS buff)
+    {
+        if(!GetIfHasBuff(buff))
+        {
+            Buffs.Add(buff);
+        }
+        
+    }
+
+    virtual public void TakeDamage(int atk)
+    {
+        int adjustDef = GetIfHasBuff(BaseSkillTree.BUFFS.WEAK) ? PlayerAttributes.Instance.GetWeakSkillAdjustDefValue(): 0;
+        int actualDMG = Mathf.Clamp(atk - CurrentAttributes[(int)PlayerAttributes.PLAYER_ATT.DEF] - adjustDef, 1, int.MaxValue);
+        CurrentAttributes[(int)PlayerAttributes.PLAYER_ATT.HP] -= actualDMG;
+    }
+
+    virtual public int DoDamage()
+    {
+        return CurrentAttributes[(int)PlayerAttributes.PLAYER_ATT.ATK];
+    }
+
+    public int GetCurrentHP()
+    {
+        return CurrentAttributes[(int)PlayerAttributes.PLAYER_ATT.HP];
+    }
+
+    public virtual void StartBattle()
+    {
+
+    }
+
+}
